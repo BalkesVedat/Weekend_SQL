@@ -175,9 +175,12 @@ Veri Tabanlarýnda komutla iþlam yapmak için kullanýlan script dilidir. Veri Taba
 --SELECT MAX(UnitPrice) AS 'En Yüksek Ürün Fiyatý' FROM Products
 
 -- SUBQUERY
+-- Bir sorgu içerisinde baþka bir sorgu yazýldýðýnda iç sorguya subquery denir. Bazý iþlemler tek sorgu ile halledilemediðinde yardýmcý olarak kullanýlýr. Bir sorgu tarafýndan çekilen veriler baþka bir sorguya devredilerek tekrar sorgulanabilir.
+
 --SELECT ProductName AS 'En Yüksek Fiyatlý Ürün', UnitPrice FROM Products WHERE UnitPrice = (SELECT MAX(UnitPrice) FROM Products)
 
 --JOIN
+-- SQL de SELECT komutu ile tablolardan veri çekeriz. SELECT ifadesinde FROM dan sonra verinin çekileceði tablonun adýný yazarýz. Eðer çekilecek olan veri tek bir tablodan gelmeyecekse yani birden fazla tablodan veri birleþtirilerek çekilecek ise, FROM dan sonra yazdýðýmýz tabloya diðer tabloyu (ya da tablolarý) JOIN komutu ile birleþtiririz. Böylece diðer tabloyu da sorgumuza baðlamýþ oluruz ve onun içindeki alnlardan da veri alabiliriz. JOIN ile baðladýðýmýz diðer tablodan iliþkili verileri çekebiliriz. Tablolarý birleþtirerek tek bir tabloymuþ gibi çalýþabilmemizi saðlar.
 
 -- Ürünlerin Kategori Ýsimleri
 --SELECT ProductName,CategoryName FROM Products 
@@ -198,4 +201,45 @@ Veri Tabanlarýnda komutla iþlam yapmak için kullanýlan script dilidir. Veri Taba
 
 --SELECT [OrderID],ProductName,[Order Details].[UnitPrice],[Quantity],[Order Details].[UnitPrice]*[Quantity] AS 'Tutar' FROM [Order Details] JOIN Products ON  [Order Details].ProductID = Products.ProductID
 
-SELECT [OrderID],SUM([Order Details].[UnitPrice]*[Quantity]) AS ' Toplam Tutar', COUNT([OrderID]) AS 'Ürün Sayýsý' FROM [Order Details] GROUP BY [OrderID]
+
+--GROUP BY
+-- GROUP BY ifadesi sorgularda tekrar eden verileri gruplandýrarak tek satýra birleþtirir. Bu birleþtirilen datalar üzerinde de toplama, ortalama, saydýrma, v.b. iþlemleri yapýlabilir. Örneðin ürünler listesinde ürün adlarýna göre grupma yapýlarak, ürünün satýþ adetleri toplanabilir. Genellikle SUM(), COUNT(), AVG(), MAX(), MIN(), v.b. gibi birleþtirilen satýrlar üzerinde iþlem yapan fonksiyonlarla (Aggregate functions) birlikte kullanýlýr.
+
+--SELECT City FROM Employees GROUP BY City
+--SELECT City,COUNT(City) AS 'Adet' FROM Employees GROUP BY City
+
+--SELECT [OrderID],SUM([Order Details].[UnitPrice]*[Quantity]) AS ' Toplam Tutar', COUNT([OrderID]) AS 'Ürün Sayýsý' FROM [Order Details] GROUP BY [OrderID]
+
+--SELECT Orders.[OrderID],SUM([Order Details].[UnitPrice]*[Quantity]) AS ' Toplam Tutar', COUNT([Order Details].[OrderID]) AS 'Ürün Sayýsý', CompanyName, Address, Phone, City, Country FROM [Order Details] 
+--JOIN Orders ON [Order Details].[OrderID] = Orders.[OrderID] 
+--JOIN Customers ON Orders.CustomerID = Customers.CustomerID
+--GROUP BY Orders.[OrderID],CompanyName,Address,Phone,City,Country
+
+--SELECT [FirstName],[LastName], SUM([Order Details].[UnitPrice]*[Quantity]) AS 'Toplam Satýþ Tutarý' FROM [Order Details] 
+--JOIN Orders ON [Order Details].[OrderID] = Orders.[OrderID] 
+--JOIN Employees ON Orders.[EmployeeID] = [Employees].[EmployeeID]
+--GROUP BY [FirstName],[LastName]
+--ORDER BY 'Toplam Satýþ Tutarý' DESC
+
+--DISTINCT
+--Tekrarlanan veriyi engeller, her verinin 1 kere yazýlmasýný saðlar.
+--select DISTINCT Country,City from Customers
+--SELECT Count(DISTINCT ProductID) AS 'Satýlan Ürün Çeþidi Sayýsý' From [Order Details]
+
+
+-- ÖRNEK ÇALIÞMA :
+--------------------------
+
+--INSERT INTO Categories ([CategoryName],[Description]) VALUES ('Araba','Otomobil ve oto parçalarý') 
+
+--DELETE FROM Categories WHERE CategoryID = 25
+--DELETE FROM Categories WHERE CategoryName = 'Araba'
+--DELETE FROM Categories WHERE Description like '%oto%'
+
+--UPDATE Categories SET CategoryName = 'Araba', Description = 'Otomobil ve Oto parçalarý'  WHERE  CategoryName = 'yyyyyyy'
+
+--DROP TABLE Categories2
+
+SELECT * FROM sys.Tables
+SELECT * FROM sys.databases
+SELECT * FROM sys.all_objects where [name] like 'Cust%'
