@@ -182,6 +182,27 @@ Veri Tabanlarýnda komutla iþlam yapmak için kullanýlan script dilidir. Veri Taba
 --JOIN
 -- SQL de SELECT komutu ile tablolardan veri çekeriz. SELECT ifadesinde FROM dan sonra verinin çekileceði tablonun adýný yazarýz. Eðer çekilecek olan veri tek bir tablodan gelmeyecekse yani birden fazla tablodan veri birleþtirilerek çekilecek ise, FROM dan sonra yazdýðýmýz tabloya diðer tabloyu (ya da tablolarý) JOIN komutu ile birleþtiririz. Böylece diðer tabloyu da sorgumuza baðlamýþ oluruz ve onun içindeki alnlardan da veri alabiliriz. JOIN ile baðladýðýmýz diðer tablodan iliþkili verileri çekebiliriz. Tablolarý birleþtirerek tek bir tabloymuþ gibi çalýþabilmemizi saðlar.
 
+-- SELECT alan listesi FROM Tablo1 
+--  (INNER/LEFT OUTER/RIGHT OUTER/FULL OUTER) JOIN Tablo2 ON Tablo1.ID = Tablo2.ID 
+
+/*
+	JOIN TURLERÝ:
+	1. INNER JOIN :
+		Her 2 tabloda da bulunan kayýtlarý listeler. Bir tabloda olup, diðer tabloda olmayan ID ye ait kayýtlar sorguda çýkmaz. 
+	2. LEFT OUTER JOIN: 
+		Tablolarý birbirine join'lerken "ON" ifadesinden sonra yazýlan eþitliðin SOL tarafýndaki tabloda bulunan tüm kayýtlarýn raporda çýkmasýný saðlar. 
+	3. RIGHT OUTER JOIN: 
+		Tablolarý birbirine join'lerken "ON" ifadesinden sonra yazýlan eþitliðin SAÐ tarafýndaki tabloda bulunan tüm kayýtlarýn raporda çýkmasýný saðlar. 
+	4. FULL OUTER JOIN:
+		JOIN de yer alan her 2 tablodaki verilerin tamamýnýn raporlanmasýný saðlar. 
+		
+	NOT: OUTER JOIN'lerde, SELECT listesindeki veri hangi tablodan geliyorsa, ilgili tabloya ait datalar dolu gelirken, verinin bulunmadýðý diðer tabloya ait alanlar "NULL" olarak gelir.
+
+*/
+
+
+
+
 -- Ürünlerin Kategori Ýsimleri
 --SELECT ProductName,CategoryName FROM Products 
 --JOIN Categories ON Products.CategoryID = Categories.CategoryID 
@@ -221,10 +242,68 @@ Veri Tabanlarýnda komutla iþlam yapmak için kullanýlan script dilidir. Veri Taba
 --GROUP BY [FirstName],[LastName]
 --ORDER BY 'Toplam Satýþ Tutarý' DESC
 
+
+SELECT OrderID, COUNT(P.ProductName) AS 'Ürün çeþidi', SUM(Quantity) AS 'Toplam ürün adedi'
+,SUM(P.UnitPrice * Quantity) AS 'Toplam Maliyet'
+,SUM(OD.UnitPrice * Quantity) AS 'Toplam Satýþ Tutarý'
+,SUM((OD.UnitPrice * Quantity) - (P.UnitPrice * Quantity)) AS 'Brüt Kar'
+FROM [Order Details] AS OD
+JOIN Products AS P ON OD.ProductID = P.ProductID
+GROUP BY OrderID
+ORDER BY OrderID
+
+
+SELECT OrderID, SUM((OD.UnitPrice * Quantity) - (P.UnitPrice * Quantity)) AS 'Toplam Brüt Kar' 
+FROM [Order Details] AS OD
+JOIN Products AS P ON OD.ProductID = P.ProductID
+GROUP BY OrderID
+ORDER BY OrderID
+
+
+
 --DISTINCT
 --Tekrarlanan veriyi engeller, her verinin 1 kere yazýlmasýný saðlar.
 --select DISTINCT Country,City from Customers
 --SELECT Count(DISTINCT ProductID) AS 'Satýlan Ürün Çeþidi Sayýsý' From [Order Details]
+
+
+--SELECT OrderID,P.ProductName,P.UnitPrice AS 'Maliyet Fiyatý',OD.UnitPrice AS 'Satýþ Fiyatý',Quantity
+--,P.UnitPrice*Quantity AS 'Toplam Maliyet'
+--,OD.UnitPrice*Quantity AS 'Toplam Satýþ Tutarý'
+--,(OD.UnitPrice*Quantity) - (P.UnitPrice*Quantity) AS 'Brüt Kar'
+--FROM [Order Details] AS OD
+--JOIN Products AS P ON OD.ProductID = P.ProductID
+
+
+--SELECT OrderID,P.ProductName,P.UnitPrice AS 'Maliyet Fiyatý',OD.UnitPrice AS 'Satýþ Fiyatý',Quantity
+--,P.UnitPrice*Quantity AS 'Toplam Maliyet'
+--,OD.UnitPrice*Quantity AS 'Toplam Satýþ Tutarý'
+--,(OD.UnitPrice*Quantity) - (P.UnitPrice*Quantity) AS 'Brüt Kar'
+--FROM [Order Details] AS OD
+--RIGHT OUTER JOIN Products AS P ON OD.ProductID = P.ProductID 
+
+-----------------
+
+Select Tarih,Musteri,MusteriAd,Tutar FROM Satislar
+LEFT OUTER JOIN Musteriler ON Satislar.Musteri = Musteriler.MusteriID
+
+--Select Musteri,MusteriID,MusteriAd,Adresi FROM Satislar
+--RIGHT OUTER JOIN Musteriler ON Satislar.Musteri = Musteriler.MusteriID
+--where Musteri is null
+
+--Select Musteri,Tarih,Tutar FROM Satislar
+--LEFT OUTER JOIN Musteriler ON Satislar.Musteri = Musteriler.MusteriID
+--where MusteriID is null
+
+--Select Musteri,MusteriID,MusteriAd,Adresi,Tarih,Tutar FROM Satislar
+--FULL JOIN Musteriler ON Satislar.Musteri = Musteriler.MusteriID
+----where MusteriID is null
+
+--Select Musteri,MusteriID,MusteriAd,Adresi,Tarih,Tutar FROM Satislar
+--FULL JOIN Musteriler ON Satislar.Musteri = Musteriler.MusteriID
+--where MusteriID is null OR Musteri is null
+--------------------------------------------------------------
+
 
 
 -- ÖRNEK ÇALIÞMA :
