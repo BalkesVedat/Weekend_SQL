@@ -243,21 +243,21 @@ Veri Tabanlarýnda komutla iþlam yapmak için kullanýlan script dilidir. Veri Taba
 --ORDER BY 'Toplam Satýþ Tutarý' DESC
 
 
-SELECT OrderID, COUNT(P.ProductName) AS 'Ürün çeþidi', SUM(Quantity) AS 'Toplam ürün adedi'
-,SUM(P.UnitPrice * Quantity) AS 'Toplam Maliyet'
-,SUM(OD.UnitPrice * Quantity) AS 'Toplam Satýþ Tutarý'
-,SUM((OD.UnitPrice * Quantity) - (P.UnitPrice * Quantity)) AS 'Brüt Kar'
-FROM [Order Details] AS OD
-JOIN Products AS P ON OD.ProductID = P.ProductID
-GROUP BY OrderID
-ORDER BY OrderID
+--SELECT OrderID, COUNT(P.ProductName) AS 'Ürün çeþidi', SUM(Quantity) AS 'Toplam ürün adedi'
+--,SUM(P.UnitPrice * Quantity) AS 'Toplam Maliyet'
+--,SUM(OD.UnitPrice * Quantity) AS 'Toplam Satýþ Tutarý'
+--,SUM((OD.UnitPrice * Quantity) - (P.UnitPrice * Quantity)) AS 'Brüt Kar'
+--FROM [Order Details] AS OD
+--JOIN Products AS P ON OD.ProductID = P.ProductID
+--GROUP BY OrderID
+--ORDER BY OrderID
 
 
-SELECT OrderID, SUM((OD.UnitPrice * Quantity) - (P.UnitPrice * Quantity)) AS 'Toplam Brüt Kar' 
-FROM [Order Details] AS OD
-JOIN Products AS P ON OD.ProductID = P.ProductID
-GROUP BY OrderID
-ORDER BY OrderID
+--SELECT OrderID, SUM((OD.UnitPrice * Quantity) - (P.UnitPrice * Quantity)) AS 'Toplam Brüt Kar' 
+--FROM [Order Details] AS OD
+--JOIN Products AS P ON OD.ProductID = P.ProductID
+--GROUP BY OrderID
+--ORDER BY OrderID
 
 
 
@@ -284,8 +284,8 @@ ORDER BY OrderID
 
 -----------------
 
-Select Tarih,Musteri,MusteriAd,Tutar FROM Satislar
-LEFT OUTER JOIN Musteriler ON Satislar.Musteri = Musteriler.MusteriID
+--Select Tarih,Musteri,MusteriAd,Tutar FROM Satislar
+--LEFT OUTER JOIN Musteriler ON Satislar.Musteri = Musteriler.MusteriID
 
 --Select Musteri,MusteriID,MusteriAd,Adresi FROM Satislar
 --RIGHT OUTER JOIN Musteriler ON Satislar.Musteri = Musteriler.MusteriID
@@ -305,7 +305,6 @@ LEFT OUTER JOIN Musteriler ON Satislar.Musteri = Musteriler.MusteriID
 --------------------------------------------------------------
 
 
-
 -- ÖRNEK ÇALIÞMA :
 --------------------------
 
@@ -319,6 +318,101 @@ LEFT OUTER JOIN Musteriler ON Satislar.Musteri = Musteriler.MusteriID
 
 --DROP TABLE Categories2
 
-SELECT * FROM sys.Tables
-SELECT * FROM sys.databases
-SELECT * FROM sys.all_objects where [name] like 'Cust%'
+--SELECT sadece tablolarý deðil, DB nesnelerini de sorgulayabilir.
+--SELECT * FROM sys.Tables
+--SELECT * FROM sys.databases
+--SELECT * FROM sys.all_objects where [name] like 'Cust%'
+
+
+--Örnek
+--Ürünlerin stok miktarlarý
+
+
+--SELECT ProductName,SUM(UnitsInStock) AS 'Toplam Stok Adedi' FROM Products 
+--Group BY ProductName
+--order by 'Toplam Stok Adedi' DESC
+
+
+--Örnek2:
+-- Ürün bazýnda satýþ ve kar raporu:
+
+--SELECT P.ProductName, SUM(Quantity) AS 'Toplam ürün adedi'
+--,SUM(P.UnitPrice * Quantity) AS 'Toplam Maliyet'
+--,SUM(OD.UnitPrice * Quantity) AS 'Toplam Satýþ Tutarý'
+--,SUM((OD.UnitPrice * Quantity) - (P.UnitPrice * Quantity)) AS 'Brüt Kar'
+--FROM [Order Details] AS OD
+--JOIN Products AS P ON OD.ProductID = P.ProductID
+--GROUP BY P.ProductName
+--ORDER BY 'Brüt Kar' DESC
+
+
+--UPDATE [Order Details] SET UnitPrice = UnitPrice * 2
+
+
+----------------------------------------------------------------
+---------------- VIEW ------------------------------------------
+----------------------------------------------------------------
+-- Veritabanýna kaydedilen SELECT cümleleridir. VIEW lar içerisinde veri tutmaz sadece SELECT ile tablolardan ya da baþka iew lardan veri çeker. ORDER BY ifadesi VIEW içerisinde kullanýlmasý çok uygun deðildir. Bunun yerine View dan dönen veriyi sýralamak daha uygundur.
+
+
+
+--ALTER VIEW Urune_Göre_Satýþ_Raporu
+--AS
+--SELECT P.ProductName, SUM(Quantity) AS 'Toplam ürün adedi'
+--,SUM(P.UnitPrice * Quantity) AS 'Toplam Maliyet'
+--,SUM(OD.UnitPrice * Quantity) AS 'Toplam Satýþ Tutarý'
+--,SUM((OD.UnitPrice * Quantity) - (P.UnitPrice * Quantity)) AS 'Brüt Kar'
+--FROM [Order Details] AS OD
+--JOIN Products AS P ON OD.ProductID = P.ProductID
+--GROUP BY P.ProductName
+
+
+--CREATE VIEW Henüz_Hiç_Satýlmamýþ_Ürünler
+--AS
+--SELECT Products.ProductID, ProductName FROM Products LEFT JOIN [Order Details] ON Products.ProductID = [Order Details].ProductID
+--WHERE [Order Details].ProductID is null
+
+
+--CREATE VIEW Müþteriye_Göre_Satýþ_Toplamlarý
+--AS
+--SELECT CompanyName, SUM([Order Details].[UnitPrice]*[Quantity]) AS ' Toplam Tutar' FROM [Order Details] 
+--JOIN Orders ON [Order Details].[OrderID] = Orders.[OrderID] 
+--JOIN Customers ON Orders.CustomerID = Customers.CustomerID
+--GROUP BY CompanyName
+
+
+--SELECT * FROM Personele_Göre_Satýþ_Tutarlarý 
+--ORDER BY [Toplam Tutar] DESC
+
+
+---------------------------------------------
+------------- SP - Stored Procedures --------
+---------------------------------------------
+
+--Veri Tabanýnýn programlama nesneleridir. Ýçlerinde SELECT te dahil olmak üzere herhangi bir SQL programý yazýlabilir. EXECUTE komutu ile çalýþtýrýlýr. DDL, DML, DCL, DRL, ya da tüm programlama komutlarýýný içerebilir.
+
+--ALTER PROC HelloWorld
+--(
+--@gelenBilgi nvarchar(50),
+--@musteriID int
+-- )
+--AS
+--BEGIN
+	
+--	DECLARE @sayac int
+--	DECLARE @mesaj nvarchar(MAX)
+
+--	SELECT @mesaj = @gelenBilgi
+--	SELECT @sayac = 0
+
+--	WHILE @sayac < 10
+--	BEGIN
+--		Print @mesaj
+--		SELECT @sayac = @sayac + 1
+--	END
+
+--END
+
+
+
+--EXECUTE [HelloWorld] 'Hello World!',2
